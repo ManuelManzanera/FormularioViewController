@@ -14,11 +14,13 @@
 @property (nonatomic, strong) UITextField *passWordTextField;
 @property (nonatomic, strong) UITextField *mailTextField;
 
+@property (nonatomic, strong) UIButton *loginButton;
+
 @end
 
 @implementation ViewController
 
-@synthesize nameTextField, mailTextField, passWordTextField;
+@synthesize nameTextField, mailTextField, passWordTextField, loginButton;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -76,6 +78,62 @@
     
     [self.view addSubview:passWordTextField];
     
+    loginButton = [[UIButton alloc] initWithFrame:CGRectMake(0., 0., 100., 30.)];
+    [loginButton setCenter:CGPointMake(self.view.center.x, passWordTextField.center.y + passWordTextField.frame.size.height + loginButton.frame.size.height)];
+    [loginButton setTitle:NSLocalizedString(@"Check", nil) forState:UIControlStateNormal];
+    [loginButton setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
+    [loginButton addTarget:self action:@selector(checkAction) forControlEvents:UIControlEventTouchUpInside];
+    
+    [self.view addSubview:loginButton];
+    
+}
+
+- (void)checkAction
+{
+    if([self checkFields])
+        NSLog(@"Todo OK");
+}
+
+- (BOOL)checkFields
+{
+    if(nameTextField.text.length == 0)
+    {
+        [self presentAlertViewWithMessage:NSLocalizedString(@"El campo nombre no puede estar vacío.", nil)];
+        return false;
+    }
+    if(nameTextField.text.length > 20)
+    {
+        [self presentAlertViewWithMessage:NSLocalizedString(@"El campo nombre no puede superar los 20 caracteres.", nil)];
+        return false;
+    }
+    if(passWordTextField.text.length == 0)
+    {
+        [self presentAlertViewWithMessage:NSLocalizedString(@"El campo password no puede estar vacío.", nil)];
+        return false;
+    }
+    if(passWordTextField.text.length > 6)
+    {
+        [self presentAlertViewWithMessage:NSLocalizedString(@"El campo password no puede superar los 6 caracteres.", nil)];
+        return false;
+    }
+    if(mailTextField.text.length == 0)
+    {
+        [self presentAlertViewWithMessage:NSLocalizedString(@"El campo email no puede estar vacío.", nil)];
+        return false;
+    }
+    if(mailTextField.text.length > 50)
+    {
+        [self presentAlertViewWithMessage:NSLocalizedString(@"El campo email no puede superar los 50 caracteres.", nil)];
+        return false;
+    }
+    
+    return true;
+}
+
+- (void)presentAlertViewWithMessage:(NSString *)message
+{
+    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"iOS en español" message:message delegate:nil cancelButtonTitle:NSLocalizedString(@"Aceptar", nil) otherButtonTitles:nil, nil];
+    [alertView show];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -108,6 +166,17 @@
 //Método que se llama cuando se introducae algún valor por teclado
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
 {
+    NSUInteger newLength;
+    
+    newLength = [textField.text length] + [string length] - range.length;
+    
+    if([textField isEqual:nameTextField])
+        return (newLength > 20) ? NO : YES;
+    if([textField isEqual:mailTextField])
+        return (newLength > 50) ? NO : YES;
+    if([textField isEqual:passWordTextField])
+        return (newLength > 6) ? NO : YES;
+
     return YES;
 }
 
